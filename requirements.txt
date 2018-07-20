@@ -1,0 +1,8 @@
+twilio
+Flask
+pymysql
+passlib
+flask-sqlalchemy
+flask_httpauth
+flask-cors
+email_validator
