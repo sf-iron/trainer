@@ -4,8 +4,7 @@ node_js:
   - "stable"
 cache:
   directories:
-    - static/node_modules
-before_script: cd static
+    - node_modules
 script:
   - npm test
   - npm run build
