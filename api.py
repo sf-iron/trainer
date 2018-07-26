@@ -4,7 +4,7 @@ from datetime import datetime
 import datetime
 from flask_mail import Message
 
-from application import  db, mail
+from app import app, db, mail
 from models import User
 
 auth = HTTPBasicAuth()
