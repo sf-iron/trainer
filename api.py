@@ -1,9 +1,9 @@
-from flask import request, jsonify, g, abort
+from flask import request, jsonify, g, abort, send_from_directory
 from flask_httpauth import HTTPBasicAuth
 from datetime import datetime
 import datetime
 from flask_mail import Message
-
+import os
 from app import application, db, mail
 from models import User
 
@@ -46,9 +46,13 @@ def verify_password(email_or_token, password):
     return True
 
 
-@application.route("/")
-def home():
-    return jsonify({'message': 'Welcome'})
+@application.route('/', defaults={'path': ''})
+@application.route('/<path:path>')
+def serve(path):
+    if path != "" and os.path.exists("static/build/" + path):
+        return send_from_directory('static/build', path)
+    else:
+        return send_from_directory('static/build', 'index.html')
 
 
 @application.route("/users", methods=['GET', 'POST'])

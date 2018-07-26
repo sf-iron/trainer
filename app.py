@@ -5,7 +5,7 @@ from flask_mail import Mail
 
 import os
 
-application = Flask(__name__)
+application = Flask(__name__, static_folder='static/build')
 # application.config.from_pyfile('config.py')
 db = SQLAlchemy(application)
 CORS(application)
