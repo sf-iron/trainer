@@ -4,7 +4,7 @@ from datetime import datetime
 import datetime
 from flask_mail import Message
 
-from app import app, db, mail
+from app import application, db, mail
 from models import User
 
 auth = HTTPBasicAuth()
@@ -46,12 +46,12 @@ def verify_password(email_or_token, password):
     return True
 
 
-@app.route("/")
+@application.route("/")
 def home():
     return jsonify({'message': 'Welcome'})
 
 
-@app.route("/users", methods=['GET', 'POST'])
+@application.route("/users", methods=['GET', 'POST'])
 def new_user():
     if request.method == 'POST':
         email = request.json.get('email')
@@ -77,7 +77,7 @@ def new_user():
             abort(422)
 
 
-@app.route("/user-activation/<activation_key>")
+@application.route("/user-activation/<activation_key>")
 def activate_user(activation_key):
     user_id = User.verify_activation_key(activation_key)
     # print(user_id)
@@ -93,7 +93,7 @@ def activate_user(activation_key):
         abort(400)
 
 
-@app.route('/user-activation', methods=['POST'])
+@application.route('/user-activation', methods=['POST'])
 def resend_email():
     email = request.json.get('email')
     try:
@@ -106,14 +106,14 @@ def resend_email():
         abort(401)
 
 
-@app.route("/token")
+@application.route("/token")
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({'token': token})
 
 
-@app.route("/user")
+@application.route("/user")
 @auth.login_required
 def user():
     return jsonify({'email': g.user.email, 'user_id': g.user.id}), 200

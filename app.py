@@ -5,16 +5,16 @@ from flask_mail import Mail
 
 import os
 
-app = Flask(__name__)
-# app.config.from_pyfile('config.py')
-db = SQLAlchemy(app)
-CORS(app)
-mail = Mail(app)
+application = Flask(__name__)
+# application.config.from_pyfile('config.py')
+db = SQLAlchemy(application)
+CORS(application)
+mail = Mail(application)
 
 
 from api import *
 from models import *
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+    application.debug = True
+    application.run()
