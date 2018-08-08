@@ -1,19 +1,20 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask_graphql import GraphQLView
 from flask_cors import CORS
 from flask_mail import Mail
 
-import os
+from database import db_session
+from schema import schema
+
 
 application = Flask(__name__, static_folder='static/build')
 # application.config.from_pyfile('config.py')
-db = SQLAlchemy(application)
+# db = SQLAlchemy(application)
 CORS(application)
 mail = Mail(application)
 
+application.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True, context={'session': db_session}))
 
-from api import *
-from models import *
 
 if __name__ == "__main__":
     application.debug = True

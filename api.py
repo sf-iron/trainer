@@ -1,13 +1,18 @@
 from flask import request, jsonify, g, abort, send_from_directory
 from flask_httpauth import HTTPBasicAuth
+from flask_graphql import GraphQLView
 from datetime import datetime
 import datetime
 from flask_mail import Message
 import os
 from app import application, db, mail
+from database import db_session
 from models import User
+from schema import schema
 
 auth = HTTPBasicAuth()
+
+application.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True, context={'session': db_session}))
 
 
 def send_msg(subject, body, recipients=["josh@sf-iron.com"]):
