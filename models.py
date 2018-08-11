@@ -79,3 +79,4 @@ class User(db.Model):
             return None
         user_id = data['id']
         return user_id
+
