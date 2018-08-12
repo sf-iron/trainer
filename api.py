@@ -1,11 +1,12 @@
 from flask import request, jsonify, g, abort, send_from_directory
 from flask_httpauth import HTTPBasicAuth
+from flask_graphql import GraphQLView
 from datetime import datetime
 import datetime
 from flask_mail import Message
-import os
-from app import application, db, mail
-from models import User
+from app import application, mail
+from database import db_session as db, User
+from schema import schema
 
 auth = HTTPBasicAuth()
 
@@ -13,7 +14,7 @@ auth = HTTPBasicAuth()
 def send_msg(subject, body, recipients=["josh@sf-iron.com"]):
     try:
         msg = Message(
-            sender=app.config['MAIL_USERNAME'],
+            sender='trainer@trainer-app.com',
             subject=subject,
             body=body,
             recipients=recipients)
@@ -32,76 +33,64 @@ def verify_password(email_or_token, password):
     user_id = User.verify_auth_token(email_or_token)
     print(user_id)
     if user_id:
-        user = User.query.filter_by(id=user_id).first()
+        user = db.query(User).filter_by(id=user_id).first()
         print(user)
     else:
-        user = User.query.filter_by(email=email_or_token).first()
+        user = db.query(User).filter_by(email=email_or_token).first()
         print(user)
         if (not user) and (not user.verify_password(password)):
             return False
-    if not user.account_activated:
+    if not user.activated:
         return False
     g.user = user
     print(g.user)
     return True
 
 
-@application.route('/', defaults={'path': ''})
-@application.route('/<path:path>')
-def serve(path):
-    if path != "" and os.path.exists("static/build/" + path):
-        return send_from_directory('static/build', path)
-    else:
-        return send_from_directory('static/build', 'index.html')
+@application.route('/')
+def serve():
+   return send_from_directory('static/build', 'index.html')
 
 
-@application.route("/users", methods=['GET', 'POST'])
-def new_user():
-    if request.method == 'POST':
-        email = request.json.get('email')
-        password = request.json.get('password')
+@application.route("/sign-up", methods=['POST'])
+def sign_up():
+    email = request.json.get('email')
+    password = request.json.get('password')
 
-        if not email or not password:
-            abort(400)
-
-        try:
-            user = User(email=email, password=password)
-            # user.hash_password(password)
-            db.session.add(user)
-            db.session.commit()
-            activation_url = generate_activation_url(user)
-
-            send_msg('Activate your account', 'Activation URL: ' + activation_url)
-            goal = Goals(user_id=user.id)
-            db.session.add(goal)
-            db.session.commit()
-            return jsonify({'email': user.email, 'user_id': user.id, 'activation_url': activation_url}), 201
-        except Exception as e:
-            print(e)
-            abort(422)
+    if not email or not password:
+        abort(400)
+    try:
+        user = User(email=email, password=password)
+        db.add(user)
+        db.commit()
+        activation_url = generate_activation_url(user)
+        send_msg('Activate your account', 'Activation URL: ' + activation_url)
+        return jsonify({'email': user.email, 'user_id': user.id, 'activation_url': activation_url}), 201
+    except Exception as e:
+        print(e)
+        abort(422)
 
 
-@application.route("/user-activation/<activation_key>")
+@application.route("/activate/<activation_key>")
 def activate_user(activation_key):
     user_id = User.verify_activation_key(activation_key)
-    # print(user_id)
     if user_id:
-        user = User.query.filter_by(id=user_id).first()
-        user.account_activated = True
+        user = db.query(User).filter_by(id=user_id).first()
+        user.activated = True
         user.activated_at = datetime.datetime.now()
         db.session.add(user)
         db.session.commit()
-        print(user)
+
         return jsonify({'user_id': user.id})
     else:
         abort(400)
 
 
-@application.route('/user-activation', methods=['POST'])
+@application.route('/activate', methods=['POST'])
 def resend_email():
     email = request.json.get('email')
     try:
-        user = User.query.filter_by(email=email).first()
+        user = db.query(User).filter_by(email=email).first()
         if user:
             send_msg('Activate your account', 'Activation URL: ' + generate_activation_url(user))
             return jsonify({'user_id': user.id})
@@ -110,14 +99,14 @@ def resend_email():
         abort(401)
 
 
+@application.route("/graphql")
+@auth.login_required
+def graphql():
+    return GraphQLView.as_view('graphql', schema=schema, graphiql=True, context={'user': g.user, 'session': db})
+
+
 @application.route("/token")
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({'token': token})
-
-
-@application.route("/user")
-@auth.login_required
-def user():
-    return jsonify({'email': g.user.email, 'user_id': g.user.id}), 200
