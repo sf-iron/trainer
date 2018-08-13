@@ -8,6 +8,7 @@ cache:
 script:
 - npm test
 - npm run build
+after_install: cd ..
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIAJH547VGDVIT5C6VQ
