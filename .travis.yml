@@ -1,10 +1,20 @@
 before_install: cd static
 language: node_js
 node_js:
-  - "stable"
+- stable
 cache:
   directories:
-    - node_modules
+  - node_modules
 script:
-  - npm test
-  - npm run build
+- npm test
+- npm run build
+deploy:
+  provider: elasticbeanstalk
+  access_key_id: AKIAJH547VGDVIT5C6VQ
+  secret_access_key:
+    secure: Q1+DYTgvm6t+gHPlSMFIJuUF0Nu1mTffVuJqaotuZ/rlmXEMdMvPN9mTosGB3usE1O+VhWYm78xjU4xSqi0viCsXDKI2zYtNxm59abugtscIMwjEUCX2QQJYfiapQykl0nl80C6SeCDKNDmystWHeFYTJL1ISLTBjug0ZKnjoNigqRywJCPsrQ71BMLORuBmoJcgoPx3V7XXECX+JWQbNlftKEwrOYLDVWE4bfWq95txhMuSQdrkYNp+mFY/MXA4zKPR1pWJ4IIXbh/bjphjD5pK8ysY6Lw0WdlsRUXefysupC4yCxXnZBMybPZSB9HpF52Ka2ahJXFJCN1Vhp6Fb/C+wpIvSNwoT3/BjWHljbjk0L7J0CfZA0CKDe/ngqHslhl6pGbCTzMqtXpJeeAhJhcLUqbzkNu+n4CITet3Y6JI+f0EUKzymqrM+cv5NgfQwcUldaEP0iXr6QKS9rt+txT2FwGSZe2eOlXQV8JuY/gCeXiagAuwCCwQdejbaF5Ko1wczacc8rumqHo6F/uNni9CwEr0LChMBMKw97qq1EBVgqaYXCodweNXiVukEa1GyH06qOHZuYyHFcnI5bbfWQAouBFjOllwDvc93ZerfjMaVQSj15PRFdLvcIx+s704rp5qr1nZEsVp+xtliCqOwWEQELTzVvqEexmqK3aQJYA=
+  region: us-east-1
+  app: trainer
+  env: trainer-dev
+  on:
+    repo: sf-iron/trainer

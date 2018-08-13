@@ -3,8 +3,7 @@ from flask_cors import CORS
 from flask_mail import Mail
 
 application = Flask(__name__, static_folder='static/build/static')
-# application.config.from_pyfile('config.py')
-# db = SQLAlchemy(application)
+application.config.from_pyfile('config.py')
 CORS(application)
 mail = Mail(application)
 

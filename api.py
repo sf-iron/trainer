@@ -11,12 +11,13 @@ from schema import schema
 auth = HTTPBasicAuth()
 
 
-def send_msg(subject, body, recipients=["josh@sf-iron.com"]):
+def send_msg(subject, body, html, recipients=["mikeabell2@gmail.com"]):
     try:
         msg = Message(
             sender='trainer@trainer-app.com',
             subject=subject,
             body=body,
+            html=html,
             recipients=recipients)
         mail.send(msg)
     except Exception as e:
@@ -25,7 +26,7 @@ def send_msg(subject, body, recipients=["josh@sf-iron.com"]):
 
 def generate_activation_url(user):
     activation_key = user.generate_activation_key()
-    return "http://localhost:8080/#/activate/" + activation_key
+    return "http://activate/" + activation_key
 
 
 @auth.verify_password
@@ -64,7 +65,9 @@ def sign_up():
         db.add(user)
         db.commit()
         activation_url = generate_activation_url(user)
-        send_msg('Activate your account', 'Activation URL: ' + activation_url)
+        send_msg('Activate your account',
+                 'Activation URL: ' + activation_url,
+                 '<a href="'+activation_url+'" target="_blank">Activate your account</a>')
         return jsonify({'email': user.email, 'user_id': user.id, 'activation_url': activation_url}), 201
     except Exception as e:
         print(e)
@@ -97,6 +100,11 @@ def resend_email():
     except Exception as e:
         print(e)
         abort(401)
+
+
+@application.route("/apple-app-site-association")
+def universal_links():
+    return jsonify({'applinks': {'apps': [], 'details': [{'appID': '29DWXCY7LN.com.sf.iron.trainer', 'paths': ['*']}]}})
 
 
 @application.route("/graphql")

@@ -1,5 +1,6 @@
 import random
 import string
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -10,7 +11,8 @@ from email_validator import validate_email, EmailNotValidError
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (URLSafeTimedSerializer as Serializer, BadSignature, SignatureExpired)
 
-engine = create_engine('postgresql://postgres:postgres@localhost:5432/trainer', convert_unicode=True)
+db_endpoint = os.environ['DB_ENDPOINT'] or 'postgresql://postgres:postgres@localhost:5432/trainer'
+engine = create_engine(db_endpoint, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
