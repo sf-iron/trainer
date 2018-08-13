@@ -10,7 +10,7 @@ script:
 - npm run build
 before_deploy:
 - cd ..
-- zip -r --exclude=\*.git\* --exclude=\static/node_modules\*  artifact.zip
+- zip -r --exclude=\*.git\* --exclude=\*node_modules\* --exclude=\venv\* artifact.zip .
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIAJH547VGDVIT5C6VQ
