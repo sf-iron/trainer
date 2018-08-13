@@ -23,3 +23,4 @@ deploy:
     repo: sf-iron/trainer
   bucket_name: elasticbeanstalk-us-east-1-342052264555
   zip_file: artifact.zip
+  skip_cleanup: true
