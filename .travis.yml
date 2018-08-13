@@ -8,7 +8,9 @@ cache:
 script:
 - npm test
 - npm run build
-before_deploy: cd ..
+before_deploy:
+- cd ..
+- zip -r --exclude=\*.git\* --exclude=\static/node_modules\*  artifact.zip
 deploy:
   provider: elasticbeanstalk
   access_key_id: AKIAJH547VGDVIT5C6VQ
@@ -20,3 +22,4 @@ deploy:
   on:
     repo: sf-iron/trainer
   bucket_name: elasticbeanstalk-us-east-1-342052264555
+  zip_file: artifact.zip

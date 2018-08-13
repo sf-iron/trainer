@@ -1,1 +1,3 @@
-venv
+venv/
+alembic/
+static/node_modules
