@@ -18,3 +18,4 @@ deploy:
   env: trainer-dev
   on:
     repo: sf-iron/trainer
+  bucket_name: elasticbeanstalk-us-east-1-342052264555

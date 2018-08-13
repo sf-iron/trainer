@@ -11,7 +11,7 @@ from email_validator import validate_email, EmailNotValidError
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import (URLSafeTimedSerializer as Serializer, BadSignature, SignatureExpired)
 
-db_endpoint = os.environ['DB_ENDPOINT'] or 'postgresql://postgres:postgres@localhost:5432/trainer'
+db_endpoint = os.environ['DB_ENDPOINT']
 engine = create_engine(db_endpoint, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
