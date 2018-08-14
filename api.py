@@ -26,7 +26,7 @@ def send_msg(subject, body, html, recipients=["mikeabell2@gmail.com"]):
 
 def generate_activation_url(user):
     activation_key = user.generate_activation_key()
-    return "http://activate/" + activation_key
+    return "https://www.surewhynotokay.com/activate/" + activation_key
 
 
 @auth.verify_password
