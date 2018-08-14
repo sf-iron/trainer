@@ -81,8 +81,8 @@ def activate_user(activation_key):
         user = db.query(User).filter_by(id=user_id).first()
         user.activated = True
         user.activated_at = datetime.datetime.now()
-        db.session.add(user)
-        db.session.commit()
+        db.add(user)
+        db.commit()
 
         return jsonify({'user_id': user.id})
     else:
