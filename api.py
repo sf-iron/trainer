@@ -31,6 +31,7 @@ def generate_activation_url(user):
 
 @auth.verify_password
 def verify_password(email_or_token, password):
+    print(email_or_token)
     user_id = User.verify_auth_token(email_or_token)
     print(user_id)
     if user_id:
