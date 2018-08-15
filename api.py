@@ -11,7 +11,7 @@ from schema import schema
 auth = HTTPBasicAuth()
 
 
-def send_msg(subject, body, html, recipients=["mikeabell2@gmail.com"]):
+def send_msg(subject, body, html, recipients=["mikeabell2@gmail.com", "josh@sf-iron.com"]):
     try:
         msg = Message(
             sender='trainer@trainer-app.com',
