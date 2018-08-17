@@ -31,22 +31,26 @@ def generate_activation_url(user):
 
 @auth.verify_password
 def verify_password(email_or_token, password):
-    print(email_or_token)
-    user_id = User.verify_auth_token(email_or_token)
-    print(user_id)
-    if user_id:
-        user = db.query(User).filter_by(id=user_id).first()
-        print(user)
-    else:
-        user = db.query(User).filter_by(email=email_or_token).first()
-        print(user)
-        if (not user) and (not user.verify_password(password)):
+    try:
+        print(email_or_token)
+        user_id = User.verify_auth_token(email_or_token)
+        print(user_id)
+        if user_id:
+            user = db.query(User).filter_by(id=user_id).first()
+            print(user)
+        else:
+            user = db.query(User).filter_by(email=email_or_token).first()
+            print(user)
+            if (not user) and (not user.verify_password(password)):
+                return False
+        if not user.activated:
             return False
-    if not user.activated:
+        g.user = user
+        print(g.user)
+        return True
+    except Exception as e:
+        print(e)
         return False
-    g.user = user
-    print(g.user)
-    return True
 
 
 @application.route('/')
@@ -103,19 +107,23 @@ def resend_email():
         abort(401)
 
 
-@application.route("/apple-app-site-association")
-def universal_links():
-    return jsonify({'applinks': {'apps': [], 'details': [{'appID': '29DWXCY7LN.com.sf.iron.trainer', 'paths': ['*']}]}})
-
-
-@application.route("/graphql")
-@auth.login_required
-def graphql():
-    return GraphQLView.as_view('graphql', schema=schema, graphiql=True, context={'user': g.user, 'session': db})
-
-
 @application.route("/token")
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token()
     return jsonify({'token': token})
+
+
+@application.route("/apple-app-site-association")
+def universal_links():
+    return jsonify({'applinks': {'apps': [], 'details': [{'appID': '29DWXCY7LN.com.sf.iron.trainer', 'paths': ['*']}]}})
+
+
+
+@application.route("/graphql", methods=['POST'])
+@auth.login_required
+def graphql():
+    query = request.json.get('query')
+    return jsonify({'data': schema.execute(query, context_value={'user': g.user,'session': db}).data})
+
+

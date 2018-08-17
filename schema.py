@@ -11,8 +11,8 @@ class User(SQLAlchemyObjectType):
 class Query(graphene.ObjectType):
     user = graphene.Field(User)
 
-    @staticmethod
-    def resolve_user(info):
+    def resolve_user(self, info):
+        print(info.context)
         return info.context.get('user')
 
 
